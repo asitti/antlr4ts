@@ -38,304 +38,304 @@ import { Token } from "./Token";
  *  satisfy the superclass interface.
  */
 export class ParserRuleContext extends RuleContext {
-	private static readonly EMPTY: ParserRuleContext = new ParserRuleContext();
+  private static readonly EMPTY: ParserRuleContext = new ParserRuleContext();
 
-	/** If we are debugging or building a parse tree for a visitor,
-	 *  we need to track all of the tokens and rule invocations associated
-	 *  with this rule's context. This is empty for parsing w/o tree constr.
-	 *  operation because we don't the need to track the details about
-	 *  how we parse this rule.
-	 */
-	children?: ParseTree[];
+  /** If we are debugging or building a parse tree for a visitor,
+   *  we need to track all of the tokens and rule invocations associated
+   *  with this rule's context. This is empty for parsing w/o tree constr.
+   *  operation because we don't the need to track the details about
+   *  how we parse this rule.
+   */
+  children?: ParseTree[];
 
-	/** For debugging/tracing purposes, we want to track all of the nodes in
-	 *  the ATN traversed by the parser for a particular rule.
-	 *  This list indicates the sequence of ATN nodes used to match
-	 *  the elements of the children list. This list does not include
-	 *  ATN nodes and other rules used to match rule invocations. It
-	 *  traces the rule invocation node itself but nothing inside that
-	 *  other rule's ATN submachine.
-	 *
-	 *  There is NOT a one-to-one correspondence between the children and
-	 *  states list. There are typically many nodes in the ATN traversed
-	 *  for each element in the children list. For example, for a rule
-	 *  invocation there is the invoking state and the following state.
-	 *
-	 *  The parser state property updates field s and adds it to this list
-	 *  if we are debugging/tracing.
+  /** For debugging/tracing purposes, we want to track all of the nodes in
+   *  the ATN traversed by the parser for a particular rule.
+   *  This list indicates the sequence of ATN nodes used to match
+   *  the elements of the children list. This list does not include
+   *  ATN nodes and other rules used to match rule invocations. It
+   *  traces the rule invocation node itself but nothing inside that
+   *  other rule's ATN submachine.
+   *
+   *  There is NOT a one-to-one correspondence between the children and
+   *  states list. There are typically many nodes in the ATN traversed
+   *  for each element in the children list. For example, for a rule
+   *  invocation there is the invoking state and the following state.
+   *
+   *  The parser state property updates field s and adds it to this list
+   *  if we are debugging/tracing.
      *
      *  This does not trace states visited during prediction.
-	 */
-//	public Array<number> states;
+   */
+//  public Array<number> states;
 
-	public _start: Token;
-	public _stop: Token | undefined;
+  public _start: Token;
+  public _stop: Token | undefined;
 
-	/**
-	 * The exception that forced this rule to return. If the rule successfully
-	 * completed, this is {@code null}.
-	 */
-	exception?: RecognitionException;
+  /**
+   * The exception that forced this rule to return. If the rule successfully
+   * completed, this is {@code null}.
+   */
+  exception?: RecognitionException;
 
-	constructor();
-	constructor(parent: ParserRuleContext | undefined, invokingStateNumber: number);
-	constructor(parent?: ParserRuleContext, invokingStateNumber?: number) {
-		if (invokingStateNumber == null) {
-			super();
-		} else {
-			super(parent, invokingStateNumber);
-		}
-	}
+  constructor();
+  constructor(parent: ParserRuleContext | undefined, invokingStateNumber: number);
+  constructor(parent?: ParserRuleContext, invokingStateNumber?: number) {
+    if (invokingStateNumber == null) {
+      super();
+    } else {
+      super(parent, invokingStateNumber);
+    }
+  }
 
-	static emptyContext(): ParserRuleContext {
-		return ParserRuleContext.EMPTY;
-	}
+  static emptyContext(): ParserRuleContext {
+    return ParserRuleContext.EMPTY;
+  }
 
-	/**
-	 * COPY a ctx (I'm deliberately not using copy constructor) to avoid
-	 * confusion with creating node with parent. Does not copy children.
-	 *
-	 * This is used in the generated parser code to flip a generic XContext
-	 * node for rule X to a YContext for alt label Y. In that sense, it is not
-	 * really a generic copy function.
-	 *
-	 * If we do an error sync() at start of a rule, we might add error nodes
-	 * to the generic XContext so this function must copy those nodes to the
-	 * YContext as well else they are lost!
-	 */
-	copyFrom(ctx: ParserRuleContext): void {
-		this._parent = ctx._parent;
-		this.invokingState = ctx.invokingState;
+  /**
+   * COPY a ctx (I'm deliberately not using copy constructor) to avoid
+   * confusion with creating node with parent. Does not copy children.
+   *
+   * This is used in the generated parser code to flip a generic XContext
+   * node for rule X to a YContext for alt label Y. In that sense, it is not
+   * really a generic copy function.
+   *
+   * If we do an error sync() at start of a rule, we might add error nodes
+   * to the generic XContext so this function must copy those nodes to the
+   * YContext as well else they are lost!
+   */
+  copyFrom(ctx: ParserRuleContext): void {
+    this._parent = ctx._parent;
+    this.invokingState = ctx.invokingState;
 
-		this._start = ctx._start;
-		this._stop = ctx._stop;
+    this._start = ctx._start;
+    this._stop = ctx._stop;
 
-		// copy any error nodes to alt label node
-		if (ctx.children) {
-			this.children = [];
-			// reset parent pointer for any error nodes
-			for (let child of ctx.children) {
-				if (child instanceof ErrorNode) {
-					this.children.push(child);
-					child._parent = this;
-				}
-			}
-		}
-	}
+    // copy any error nodes to alt label node
+    if (ctx.children) {
+      this.children = [];
+      // reset parent pointer for any error nodes
+      for (let child of ctx.children) {
+        if (child instanceof ErrorNode) {
+          this.children.push(child);
+          child._parent = this;
+        }
+      }
+    }
+  }
 
-	// Double dispatch methods for listeners
+  // Double dispatch methods for listeners
 
-	enterRule(listener: ParseTreeListener): void { }
-	exitRule(listener: ParseTreeListener): void { }
+  enterRule(listener: ParseTreeListener): void { }
+  exitRule(listener: ParseTreeListener): void { }
 
-	addChild(t: TerminalNode): void;
-	addChild(ruleInvocation: RuleContext): void;
-	addChild(matchedToken: Token): TerminalNode;
-	addChild(t: TerminalNode | RuleContext | Token): TerminalNode | void {
-		let result: TerminalNode | void;
-		if (t instanceof TerminalNode) {
-			// Does not set parent link
-		} else if (t instanceof RuleContext) {
-			// Does not set parent link
-		} else {
-			t = new TerminalNode(t);
-			t._parent = this;
-			result = t;
-		}
+  addChild(t: TerminalNode): void;
+  addChild(ruleInvocation: RuleContext): void;
+  addChild(matchedToken: Token): TerminalNode;
+  addChild(t: TerminalNode | RuleContext | Token): TerminalNode | void {
+    let result: TerminalNode | void;
+    if (t instanceof TerminalNode) {
+      // Does not set parent link
+    } else if (t instanceof RuleContext) {
+      // Does not set parent link
+    } else {
+      t = new TerminalNode(t);
+      t._parent = this;
+      result = t;
+    }
 
-		if (!this.children) {
-			this.children = [t];
-		} else {
-			this.children.push(t);
-		}
+    if (!this.children) {
+      this.children = [t];
+    } else {
+      this.children.push(t);
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	/** Used by enterOuterAlt to toss out a RuleContext previously added as
-	 *  we entered a rule. If we have # label, we will need to remove
-	 *  generic ruleContext object.
- 	 */
-	removeLastChild(): void {
-		if (this.children) {
-			this.children.pop();
-		}
-	}
+  /** Used by enterOuterAlt to toss out a RuleContext previously added as
+   *  we entered a rule. If we have # label, we will need to remove
+   *  generic ruleContext object.
+    */
+  removeLastChild(): void {
+    if (this.children) {
+      this.children.pop();
+    }
+  }
 
-//	public void trace(int s) {
-//		if ( states==null ) states = new ArrayList<Integer>();
-//		states.add(s);
-//	}
+//  public void trace(int s) {
+//    if ( states==null ) states = new ArrayList<Integer>();
+//    states.add(s);
+//  }
 
-	addErrorNode(badToken: Token): ErrorNode {
-		let t = new ErrorNode(badToken);
-		this.addChild(t);
-		t._parent = this;
-		return t;
-	}
+  addErrorNode(badToken: Token): ErrorNode {
+    let t = new ErrorNode(badToken);
+    this.addChild(t);
+    t._parent = this;
+    return t;
+  }
 
-	@Override
-	/** Override to make type more specific */
-	get parent(): ParserRuleContext | undefined {
-		let parent = super.parent;
-		if (parent === undefined || parent instanceof ParserRuleContext) {
-			return parent;
-		}
+  @Override
+  /** Override to make type more specific */
+  get parent(): ParserRuleContext | undefined {
+    let parent = this._parent;
+    if (parent === undefined || parent instanceof ParserRuleContext) {
+      return parent;
+    }
 
-		throw new TypeError("Invalid parent type for ParserRuleContext");
-	}
+    throw new TypeError("Invalid parent type for ParserRuleContext");
+  }
 
-	getChild(i: number): ParseTree;
-	getChild<T extends ParseTree>(i: number, ctxType: { new (...args: any[]): T; }): T;
-	// Note: in TypeScript, order or arguments reversed
-	getChild<T extends ParseTree>(i: number, ctxType?: { new (...args: any[]): T; }): ParseTree {
-		if (!this.children || i < 0 || i >= this.children.length) {
-			throw new RangeError("index parameter must be between >= 0 and <= number of children.")
-		}
+  getChild(i: number): ParseTree;
+  getChild<T extends ParseTree>(i: number, ctxType: { new (...args: any[]): T; }): T;
+  // Note: in TypeScript, order or arguments reversed
+  getChild<T extends ParseTree>(i: number, ctxType?: { new (...args: any[]): T; }): ParseTree {
+    if (!this.children || i < 0 || i >= this.children.length) {
+      throw new RangeError("index parameter must be between >= 0 and <= number of children.")
+    }
 
-		if (ctxType == null) {
-			return this.children[i];
-		}
+    if (ctxType == null) {
+      return this.children[i];
+    }
 
-		let result = this.tryGetChild(i, ctxType);
-		if (result === undefined) {
-			throw new Error("The specified node does not exist");
-		}
+    let result = this.tryGetChild(i, ctxType);
+    if (result === undefined) {
+      throw new Error("The specified node does not exist");
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	tryGetChild<T extends ParseTree>(i: number, ctxType: { new (...args: any[]): T; }): T | undefined {
-		if (!this.children || i < 0 || i >= this.children.length) {
-			return undefined;
-		}
+  tryGetChild<T extends ParseTree>(i: number, ctxType: { new (...args: any[]): T; }): T | undefined {
+    if (!this.children || i < 0 || i >= this.children.length) {
+      return undefined;
+    }
 
-		let j: number = -1; // what node with ctxType have we found?
-		for (let o of this.children) {
-			if (o instanceof ctxType) {
-				j++;
-				if (j === i) {
-					return o;
-				}
-			}
-		}
+    let j: number = -1; // what node with ctxType have we found?
+    for (let o of this.children) {
+      if (o instanceof ctxType) {
+        j++;
+        if (j === i) {
+          return o;
+        }
+      }
+    }
 
-		return undefined;
-	}
+    return undefined;
+  }
 
-	getToken(ttype: number, i: number): TerminalNode {
-		let result = this.tryGetToken(ttype, i);
-		if (result === undefined) {
-			throw new Error("The specified token does not exist");
-		}
+  getToken(ttype: number, i: number): TerminalNode {
+    let result = this.tryGetToken(ttype, i);
+    if (result === undefined) {
+      throw new Error("The specified token does not exist");
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	tryGetToken(ttype: number, i: number): TerminalNode | undefined {
-		if (!this.children || i < 0 || i >= this.children.length) {
-			return undefined;
-		}
+  tryGetToken(ttype: number, i: number): TerminalNode | undefined {
+    if (!this.children || i < 0 || i >= this.children.length) {
+      return undefined;
+    }
 
-		let j: number = -1; // what token with ttype have we found?
-		for (let o of this.children) {
-			if (o instanceof TerminalNode) {
-				let symbol: Token = o.symbol;
-				if (symbol.type === ttype) {
-					j++;
-					if (j === i) {
-						return o;
-					}
-				}
-			}
-		}
+    let j: number = -1; // what token with ttype have we found?
+    for (let o of this.children) {
+      if (o instanceof TerminalNode) {
+        let symbol: Token = o.symbol;
+        if (symbol.type === ttype) {
+          j++;
+          if (j === i) {
+            return o;
+          }
+        }
+      }
+    }
 
-		return undefined;
-	}
+    return undefined;
+  }
 
-	getTokens(ttype: number): TerminalNode[] {
-		let tokens: TerminalNode[] = [];
+  getTokens(ttype: number): TerminalNode[] {
+    let tokens: TerminalNode[] = [];
 
-		if (!this.children) {
-			return tokens;
-		}
+    if (!this.children) {
+      return tokens;
+    }
 
-		for (let o of this.children) {
-			if (o instanceof TerminalNode) {
-				let symbol = o.symbol;
-				if (symbol.type === ttype) {
-					tokens.push(o);
-				}
-			}
-		}
+    for (let o of this.children) {
+      if (o instanceof TerminalNode) {
+        let symbol = o.symbol;
+        if (symbol.type === ttype) {
+          tokens.push(o);
+        }
+      }
+    }
 
-		return tokens;
-	}
+    return tokens;
+  }
 
-	get ruleContext(): this {
-		return this;
-	}
+  get ruleContext(): this {
+    return this;
+  }
 
-	// NOTE: argument order change from Java version
-	getRuleContext<T extends ParserRuleContext>(i: number, ctxType: { new (...args: any[]): T; }): T {
-		return this.getChild(i, ctxType);
-	}
+  // NOTE: argument order change from Java version
+  getRuleContext<T extends ParserRuleContext>(i: number, ctxType: { new (...args: any[]): T; }): T {
+    return this.getChild(i, ctxType);
+  }
 
-	tryGetRuleContext<T extends ParserRuleContext>(i: number, ctxType: { new (...args: any[]): T; }): T | undefined {
-		return this.tryGetChild(i, ctxType);
-	}
+  tryGetRuleContext<T extends ParserRuleContext>(i: number, ctxType: { new (...args: any[]): T; }): T | undefined {
+    return this.tryGetChild(i, ctxType);
+  }
 
-	getRuleContexts<T extends ParserRuleContext>(ctxType: { new (...args: any[]): T; }): T[] {
-		let contexts: T[] = [];
-		if (!this.children) {
-			return contexts;
-		}
+  getRuleContexts<T extends ParserRuleContext>(ctxType: { new (...args: any[]): T; }): T[] {
+    let contexts: T[] = [];
+    if (!this.children) {
+      return contexts;
+    }
 
-		for (let o of this.children) {
-			if (o instanceof ctxType) {
-				contexts.push(o);
-			}
-		}
+    for (let o of this.children) {
+      if (o instanceof ctxType) {
+        contexts.push(o);
+      }
+    }
 
-		return contexts;
-	}
+    return contexts;
+  }
 
-	@Override
-	get childCount() {
-		return this.children ? this.children.length : 0;
-	}
+  @Override
+  get childCount() {
+    return this.children ? this.children.length : 0;
+  }
 
-	@Override
-	get sourceInterval(): Interval {
-		if (!this._start) {
-			return Interval.INVALID;
-		}
-		if (!this._stop || this._stop.tokenIndex < this._start.tokenIndex) {
-			return Interval.of(this._start.tokenIndex, this._start.tokenIndex - 1); // empty
-		}
-		return Interval.of(this._start.tokenIndex, this._stop.tokenIndex);
-	}
+  @Override
+  get sourceInterval(): Interval {
+    if (!this._start) {
+      return Interval.INVALID;
+    }
+    if (!this._stop || this._stop.tokenIndex < this._start.tokenIndex) {
+      return Interval.of(this._start.tokenIndex, this._start.tokenIndex - 1); // empty
+    }
+    return Interval.of(this._start.tokenIndex, this._stop.tokenIndex);
+  }
 
-	/**
-	 * Get the initial token in this context.
-	 * Note that the range from start to stop is inclusive, so for rules that do not consume anything
-	 * (for example, zero length or error productions) this token may exceed stop.
-	 */
-	get start(): Token { return this._start; }
-	/**
-	 * Get the final token in this context.
-	 * Note that the range from start to stop is inclusive, so for rules that do not consume anything
-	 * (for example, zero length or error productions) this token may precede start.
-	 */
-	get stop(): Token | undefined { return this._stop; }
+  /**
+   * Get the initial token in this context.
+   * Note that the range from start to stop is inclusive, so for rules that do not consume anything
+   * (for example, zero length or error productions) this token may exceed stop.
+   */
+  get start(): Token { return this._start; }
+  /**
+   * Get the final token in this context.
+   * Note that the range from start to stop is inclusive, so for rules that do not consume anything
+   * (for example, zero length or error productions) this token may precede start.
+   */
+  get stop(): Token | undefined { return this._stop; }
 
-	/** Used for rule context info debugging during parse-time, not so much for ATN debugging */
-	toInfoString(recognizer: Parser): string {
-		let rules: Array<string> =
-			recognizer.getRuleInvocationStack(this).reverse();
-		return "ParserRuleContext" + rules + "{" +
-			"start=" + this._start +
-			", stop=" + this._stop +
-			'}';
-	}
+  /** Used for rule context info debugging during parse-time, not so much for ATN debugging */
+  toInfoString(recognizer: Parser): string {
+    let rules: Array<string> =
+      recognizer.getRuleInvocationStack(this).reverse();
+    return "ParserRuleContext" + rules + "{" +
+      "start=" + this._start +
+      ", stop=" + this._stop +
+      '}';
+  }
 }

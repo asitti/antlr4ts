@@ -14,45 +14,45 @@ import { Interval } from "./misc/Interval";
 import * as Utils from "./misc/Utils";
 
 export class LexerNoViableAltException extends RecognitionException {
-	//private static serialVersionUID: number =  -730999203913001726L;
+  //private static serialVersionUID: number =  -730999203913001726L;
 
-	/** Matching attempted at what input index? */
-	private _startIndex: number;
+  /** Matching attempted at what input index? */
+  private _startIndex: number;
 
-	/** Which configurations did we try at input.index that couldn't match input.LA(1)? */
-	private _deadEndConfigs?: ATNConfigSet;
+  /** Which configurations did we try at input.index that couldn't match input.LA(1)? */
+  private _deadEndConfigs?: ATNConfigSet;
 
-	constructor(lexer: Lexer | undefined,
-		@NotNull input: CharStream,
-		startIndex: number,
-		deadEndConfigs: ATNConfigSet | undefined) {
-		super(lexer, input);
-		this._startIndex = startIndex;
-		this._deadEndConfigs = deadEndConfigs;
-	}
+  constructor(lexer: Lexer | undefined,
+    @NotNull input: CharStream,
+    startIndex: number,
+    deadEndConfigs: ATNConfigSet | undefined) {
+    super(lexer, input);
+    this._startIndex = startIndex;
+    this._deadEndConfigs = deadEndConfigs;
+  }
 
-	get startIndex(): number {
-		return this._startIndex;
-	}
+  get startIndex(): number {
+    return this._startIndex;
+  }
 
-	get deadEndConfigs(): ATNConfigSet | undefined {
-		return this._deadEndConfigs;
-	}
+  get deadEndConfigs(): ATNConfigSet | undefined {
+    return this._deadEndConfigs;
+  }
 
-	@Override
-	get inputStream(): CharStream {
-		return super.inputStream as CharStream;
-	}
+  @Override
+  get inputStream(): CharStream {
+    return this.input as CharStream;
+  }
 
-	@Override
-	toString(): string {
-		let symbol = "";
-		if (this._startIndex >= 0 && this._startIndex < this.inputStream.size) {
-			symbol = this.inputStream.getText(Interval.of(this._startIndex, this._startIndex));
-			symbol = Utils.escapeWhitespace(symbol, false);
-		}
+  @Override
+  toString(): string {
+    let symbol = "";
+    if (this._startIndex >= 0 && this._startIndex < this.inputStream.size) {
+      symbol = this.inputStream.getText(Interval.of(this._startIndex, this._startIndex));
+      symbol = Utils.escapeWhitespace(symbol, false);
+    }
 
-		// return String.format(Locale.getDefault(), "%s('%s')", LexerNoViableAltException.class.getSimpleName(), symbol);
-		return `LexerNoViableAltException('${symbol}')`;
-	}
+    // return String.format(Locale.getDefault(), "%s('%s')", LexerNoViableAltException.class.getSimpleName(), symbol);
+    return `LexerNoViableAltException('${symbol}')`;
+  }
 }

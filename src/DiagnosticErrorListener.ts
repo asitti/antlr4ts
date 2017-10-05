@@ -43,117 +43,117 @@ import { asIterable } from './misc/Stubs';
 
 export class DiagnosticErrorListener implements ParserErrorListener {
 
-	/**
-	 * Initializes a new instance of {@link DiagnosticErrorListener}, specifying
-	 * whether all ambiguities or only exact ambiguities are reported.
-	 *
-	 * @param exactOnly {@code true} to report only exact ambiguities, otherwise
-	 * {@code false} to report all ambiguities.  Defaults to true.
-	 */
-	constructor(protected exactOnly: boolean = true) {
-		this.exactOnly = exactOnly;
-	}
+  /**
+   * Initializes a new instance of {@link DiagnosticErrorListener}, specifying
+   * whether all ambiguities or only exact ambiguities are reported.
+   *
+   * @param exactOnly {@code true} to report only exact ambiguities, otherwise
+   * {@code false} to report all ambiguities.  Defaults to true.
+   */
+  constructor(protected exactOnly: boolean = true) {
+    this.exactOnly = exactOnly;
+  }
 
-	@Override
-	syntaxError<T extends Token>(
-		/*@NotNull*/ recognizer: Recognizer<T, any>,
-		offendingSymbol: T | undefined,
-		line: number,
-		charPositionInLine: number,
-		/*@NotNull*/
-		msg: string,
-		e: RecognitionException | undefined): void
-	{
-	}
+  @Override
+  syntaxError<T extends Token>(
+    /*@NotNull*/ recognizer: Recognizer<T, any>,
+    offendingSymbol: T | undefined,
+    line: number,
+    charPositionInLine: number,
+    /*@NotNull*/
+    msg: string,
+    e: RecognitionException | undefined): void
+  {
+  }
 
-	@Override
-	reportAmbiguity(@NotNull recognizer: Parser,
-		@NotNull dfa: DFA,
-		startIndex: number,
-		stopIndex: number,
-		exact: boolean,
-		ambigAlts: BitSet | undefined,
-		@NotNull configs: ATNConfigSet): void {
-		if (this.exactOnly && !exact) {
-			return;
-		}
+  @Override
+  reportAmbiguity(@NotNull recognizer: Parser,
+    @NotNull dfa: DFA,
+    startIndex: number,
+    stopIndex: number,
+    exact: boolean,
+    ambigAlts: BitSet | undefined,
+    @NotNull configs: ATNConfigSet): void {
+    if (this.exactOnly && !exact) {
+      return;
+    }
 
-		let decision: string = this.getDecisionDescription(recognizer, dfa);
-		let conflictingAlts: BitSet = this.getConflictingAlts(ambigAlts, configs);
-		let text: string = recognizer.inputStream.getText(Interval.of(startIndex, stopIndex));
-		let message: string = `reportAmbiguity d=${decision}: ambigAlts=${conflictingAlts}, input='${text}'`;
-		recognizer.notifyErrorListeners(message);
-	}
+    let decision: string = this.getDecisionDescription(recognizer, dfa);
+    let conflictingAlts: BitSet = this.getConflictingAlts(ambigAlts, configs);
+    let text: string = recognizer.inputStream.getText(Interval.of(startIndex, stopIndex));
+    let message: string = `reportAmbiguity d=${decision}: ambigAlts=${conflictingAlts}, input='${text}'`;
+    recognizer.notifyErrorListeners(message);
+  }
 
-	@Override
-	reportAttemptingFullContext(@NotNull recognizer: Parser,
-		@NotNull dfa: DFA,
-		startIndex: number,
-		stopIndex: number,
-		conflictingAlts: BitSet | undefined,
-		@NotNull conflictState: SimulatorState): void {
-		let format: string = "reportAttemptingFullContext d=%s, input='%s'";
-		let decision: string = this.getDecisionDescription(recognizer, dfa);
-		let text: string = recognizer.inputStream.getText(Interval.of(startIndex, stopIndex));
-		let message: string = `reportAttemptingFullContext d=${decision}, input='${text}'`;
-		recognizer.notifyErrorListeners(message);
-	}
+  @Override
+  reportAttemptingFullContext(@NotNull recognizer: Parser,
+    @NotNull dfa: DFA,
+    startIndex: number,
+    stopIndex: number,
+    conflictingAlts: BitSet | undefined,
+    @NotNull conflictState: SimulatorState): void {
+    let format: string = "reportAttemptingFullContext d=%s, input='%s'";
+    let decision: string = this.getDecisionDescription(recognizer, dfa);
+    let text: string = recognizer.inputStream.getText(Interval.of(startIndex, stopIndex));
+    let message: string = `reportAttemptingFullContext d=${decision}, input='${text}'`;
+    recognizer.notifyErrorListeners(message);
+  }
 
-	@Override
-	reportContextSensitivity(@NotNull recognizer: Parser,
-		@NotNull dfa: DFA,
-		startIndex: number,
-		stopIndex: number,
-		prediction: number,
-		@NotNull acceptState: SimulatorState): void {
-		let format: string = "reportContextSensitivity d=%s, input='%s'";
-		let decision: string = this.getDecisionDescription(recognizer, dfa);
-		let text: string = recognizer.inputStream.getText(Interval.of(startIndex, stopIndex));
-		let message: string = `reportContextSensitivity d=${decision}, input='${text}'`;
-		recognizer.notifyErrorListeners(message);
-	}
+  @Override
+  reportContextSensitivity(@NotNull recognizer: Parser,
+    @NotNull dfa: DFA,
+    startIndex: number,
+    stopIndex: number,
+    prediction: number,
+    @NotNull acceptState: SimulatorState): void {
+    let format: string = "reportContextSensitivity d=%s, input='%s'";
+    let decision: string = this.getDecisionDescription(recognizer, dfa);
+    let text: string = recognizer.inputStream.getText(Interval.of(startIndex, stopIndex));
+    let message: string = `reportContextSensitivity d=${decision}, input='${text}'`;
+    recognizer.notifyErrorListeners(message);
+  }
 
-	protected getDecisionDescription(
-		@NotNull recognizer: Parser,
-		@NotNull dfa: DFA): string {
-		let decision: number = dfa.decision;
-		let ruleIndex: number = dfa.atnStartState.ruleIndex;
+  protected getDecisionDescription(
+    @NotNull recognizer: Parser,
+    @NotNull dfa: DFA): string {
+    let decision: number = dfa.decision;
+    let ruleIndex: number = dfa.atnStartState.ruleIndex;
 
-		let ruleNames: string[] = recognizer.ruleNames;
-		if (ruleIndex < 0 || ruleIndex >= ruleNames.length) {
-			return decision.toString();
-		}
+    let ruleNames: string[] = recognizer.ruleNames;
+    if (ruleIndex < 0 || ruleIndex >= ruleNames.length) {
+      return decision.toString();
+    }
 
-		let ruleName: string = ruleNames[ruleIndex];
-		if (!ruleName) {
-			return decision.toString();
-		}
+    let ruleName: string = ruleNames[ruleIndex];
+    if (!ruleName) {
+      return decision.toString();
+    }
 
-		return `${decision} (${ruleName})`;
-	}
+    return `${decision} (${ruleName})`;
+  }
 
-	/**
-	 * Computes the set of conflicting or ambiguous alternatives from a
-	 * configuration set, if that information was not already provided by the
-	 * parser.
-	 *
-	 * @param reportedAlts The set of conflicting or ambiguous alternatives, as
-	 * reported by the parser.
-	 * @param configs The conflicting or ambiguous configuration set.
-	 * @return Returns {@code reportedAlts} if it is not {@code null}, otherwise
-	 * returns the set of alternatives represented in {@code configs}.
-	 */
-	@NotNull
-	protected getConflictingAlts(reportedAlts: BitSet | undefined, @NotNull configs: ATNConfigSet): BitSet {
-		if (reportedAlts != null) {
-			return reportedAlts;
-		}
+  /**
+   * Computes the set of conflicting or ambiguous alternatives from a
+   * configuration set, if that information was not already provided by the
+   * parser.
+   *
+   * @param reportedAlts The set of conflicting or ambiguous alternatives, as
+   * reported by the parser.
+   * @param configs The conflicting or ambiguous configuration set.
+   * @return Returns {@code reportedAlts} if it is not {@code null}, otherwise
+   * returns the set of alternatives represented in {@code configs}.
+   */
+  @NotNull
+  protected getConflictingAlts(reportedAlts: BitSet | undefined, @NotNull configs: ATNConfigSet): BitSet {
+    if (reportedAlts != null) {
+      return reportedAlts;
+    }
 
-		let result: BitSet = new BitSet();
-		for (let config of asIterable(configs)) {
-			result.set(config.alt);
-		}
+    let result: BitSet = new BitSet();
+    for (let config of Array.from(asIterable(configs))) {
+      result.set(config.alt);
+    }
 
-		return result;
-	}
+    return result;
+  }
 }

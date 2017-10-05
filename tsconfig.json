@@ -2,10 +2,10 @@
   "compilerOptions": {
     "outDir": "target",
     "sourceMap": true,
-    "module": "commonjs",
-    "target": "es2015",
+    "module": "es2015",
+    "target": "es5",
     "lib": [
-      "es6"
+      "es2016"
     ],
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -24,6 +24,8 @@
     "node_modules",
     "target",
     "tool",
-    "test/runtime"
+    "test/runtime",
+    "benchmark",
+    "test"
   ]
 }
